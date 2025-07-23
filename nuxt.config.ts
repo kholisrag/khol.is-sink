@@ -1,8 +1,8 @@
+import { provider } from 'std-env'
 import { currentLocales } from './i18n/i18n'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-
   modules: [
     '@nuxthub/core',
     'shadcn-nuxt',
@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    siteToken: 'SinkCool',
+    siteToken: crypto.randomUUID(),
     redirectStatusCode: '301',
     linkCacheTtl: 60,
     redirectWithQuery: false,
@@ -42,7 +42,6 @@ export default defineNuxtConfig({
   routeRules: {
     '/': {
       prerender: true,
-      ssr: false,
     },
     '/dashboard/**': {
       prerender: true,
@@ -51,18 +50,39 @@ export default defineNuxtConfig({
     '/dashboard': {
       redirect: '/dashboard/links',
     },
+    '/api/**': {
+      cors: process.env.NUXT_API_CORS === 'true',
+    },
   },
 
   future: {
     compatibilityVersion: 4,
   },
 
-  compatibilityDate: '2024-07-08',
+  experimental: {
+    enforceModuleCompatibility: true,
+  },
 
   nitro: {
     experimental: {
-      // Enable Server API documentation within NuxtHub
       openAPI: true,
+    },
+    timing: true,
+    openAPI: {
+      production: 'runtime',
+      meta: {
+        title: 'Sink API',
+        description: 'A Simple / Speedy / Secure Link Shortener with Analytics, 100% run on Cloudflare.',
+      },
+      route: '/_docs/openapi.json',
+      ui: {
+        scalar: {
+          route: '/_docs/scalar',
+        },
+        swagger: {
+          route: '/_docs/swagger',
+        },
+      },
     },
   },
 
@@ -73,6 +93,7 @@ export default defineNuxtConfig({
     cache: false,
     database: false,
     kv: true,
+    workers: provider !== 'cloudflare_pages',
   },
 
   eslint: {
