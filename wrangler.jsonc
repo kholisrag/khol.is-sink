@@ -1,10 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "khol-is-sink",
-  "main": "dist/server/index.mjs",
+  "main": ".output/server/index.mjs",
   "assets": {
     "binding": "ASSETS",
-    "directory": "dist/public"
+    "directory": ".output/public",
+    "html_handling": "drop-trailing-slash"
   },
   "compatibility_date": "2025-05-08",
   "compatibility_flags": [
@@ -12,8 +13,17 @@
   ],
   "keep_vars": true,
   "upload_source_maps": true,
+  "observability": {
+    "logs": {
+      "enabled": true
+    },
+    "traces": {
+      "enabled": true
+    }
+  },
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
+    "remote": true
   },
   "analytics_engine_datasets": [
     {
@@ -24,7 +34,16 @@
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "8184e2ddc2194243a340cc2c47e24327" // IMPORTANT: Change this to your KV namespace ID
+      "id": "8184e2ddc2194243a340cc2c47e24327" // khol.is-sink
     }
-  ]
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "khol-is-sink" // create with `wrangler r2 bucket create khol-is-sink`
+    }
+  ],
+  "triggers": {
+    "crons": ["0 0 * * *"] // Run backup task daily at 00:00 UTC
+  }
 }
